@@ -1,64 +1,129 @@
-# Lambda Hubs Web API
+# Node API 1 Project Starter Code
 
-Guided project for **Node API 1** Module.
+## Topics
 
-In this project we will learn how to create a very simple Web API using `Node.js` and `Express`, and cover the basics of `server-side routing` and using global `middleware`.
+- Building a RESTful API.
+- Performing CRUD operations.
+- Writing API endpoints.
 
-The code for the guided project will be written in a single file for simplicity. We'll see ways to structure an API to make it more maintainable in upcoming lectures.
+### Grab Starter Code
 
-## Prerequisites
-
-- an HTTP client like [Postman](https://www.getpostman.com/downloads/) or [Insomnia](https://insomnia.rest/download/).
-
-## Project Setup
-
-- [ ] **fork** and clone this repository.
-- [ ] **CD into the folder** where you cloned **your fork**.
+- **Fork** and **Clone** this repository.
+- **CD into the folder** where you cloned the repository.
 
 ## Assignment
 
-Build a RESTful Web API to manage _"Lessons"_ and _"Hubs"_. A _Hub_ is a group chat channel that brings together an instructor and a group of students from the same cohort as they work on a _Lesson_.
+Use Node.js and Express to build an API that performs CRUD operations on users.
 
-An example would be a _Hub_ created to go over the "Introduction to Node and Express" lesson for the _Web 1_ cohort.
+- Add a `.gitignore` file appropriate for `node.js` projects.
+- Add a new `package.json`.
+- Add a `server` script to `package.json` that runs the API using `nodemon`.
 
-A Lesson has:
+### Write endpoints
 
-- a unique `id`.
-- a `name`.
+Add the code necessary to create a Web API and implement the following _endpoints_:
 
-A Hub has:
+| Method | URL            | Description                                                                                            |
+| ------ | -------------- | ------------------------------------------------------------------------------------------------------ |
+| POST   | /api/users     | Creates a user using the information sent inside the `request body`.                                   |
+| GET    | /api/users     | Returns an array users.                                                                                |
+| GET    | /api/users/:id | Returns the user object with the specified `id`.                                                       |
+| DELETE | /api/users/:id | Removes the user with the specified `id` and returns the deleted user.                                 |
+| PUT    | /api/users/:id | Updates the user with the specified `id` using data from the `request body`. Returns the modified user |
 
-- a unique `id`.
-- a `name`.
-- a `lessonId` that connects it to the corresponding Lesson.
-- a `cohort`.
+#### User Schema
 
-### Features
+Each User _resource_ should conform to the following structure (AKA schema):
 
-The Web API must provide a set of `endpoints` to fulfill the following needs:
+```js
+{
+  id: "a_unique_id", // hint: use the shortid npm package to generate it
+  name: "Jane Doe", // String, required
+  bio: "Not Tarzan's Wife, another Jane",  // String, required
+}
+```
 
-- add a new Lesson.
-- view a list of existing Lessons.
-- view the details of a single Lesson
-- update the information of an existing Lesson.
-- remove a Lesson.
-- add a new Hub.
-- view a list of existing Hubs.
-- view the details of a single Hub
-- update the information of an existing Hub.
-- remove a Hub.
+#### Endpoint Specifications
 
-Here is a table with the `endpoint` descriptions:
+When the client makes a `POST` request to `/api/users`:
 
-| Action               | URL               | Method | Response         |
-| :------------------- | :---------------- | :----- | :--------------- |
-| Add a Lesson         | /api/lessons      | POST   | the new Lesson   |
-| View list of Lessons | /api/lessons      | GET    | array of Lessons |
-| View Lesson details  | /api/lessons/{id} | GET    | a Lesson         |
-| Update Lesson        | /api/lessons/{id} | PATCH  | updated Lesson   |
-| Remove a Lesson      | /api/lessons/{id} | DELETE | deleted Lesson   |
-| Add a Hub            | /api/hubs         | POST   | the new Hub      |
-| View list of Hubs    | /api/hubs         | GET    | array of Hubs    |
-| View Hub details     | /api/hubs/{id}    | GET    | a Hub            |
-| Update Hub           | /api/hubs/{id}    | PATCH  | updated Hub      |
-| Remove a Hub         | /api/hubs/{id}    | DELETE | deleted Hub      |
+- If the request body is missing the `name` or `bio` property:
+
+  - respond with HTTP status code `400` (Bad Request).
+  - return the following JSON response: `{ errorMessage: "Please provide name and bio for the user." }`.
+
+- If the information about the _user_ is valid:
+
+  - save the new _user_ the the database.
+  - respond with HTTP status code `201` (Created).
+  - return the newly created _user document_.
+
+- If there's an error while saving the _user_:
+  - respond with HTTP status code `500` (Server Error).
+  - return the following JSON object: `{ errorMessage: "There was an error while saving the user to the database" }`.
+
+When the client makes a `GET` request to `/api/users`:
+
+- If there's an error in retrieving the _users_ from the database:
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ errorMessage: "The users information could not be retrieved." }`.
+
+When the client makes a `GET` request to `/api/users/:id`:
+
+- If the _user_ with the specified `id` is not found:
+
+  - respond with HTTP status code `404` (Not Found).
+  - return the following JSON object: `{ message: "The user with the specified ID does not exist." }`.
+
+- If there's an error in retrieving the _user_ from the database:
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ errorMessage: "The user information could not be retrieved." }`.
+
+When the client makes a `DELETE` request to `/api/users/:id`:
+
+- If the _user_ with the specified `id` is not found:
+
+  - respond with HTTP status code `404` (Not Found).
+  - return the following JSON object: `{ message: "The user with the specified ID does not exist." }`.
+
+- If there's an error in removing the _user_ from the database:
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ errorMessage: "The user could not be removed" }`.
+
+When the client makes a `PUT` request to `/api/users/:id`:
+
+- If the _user_ with the specified `id` is not found:
+
+  - respond with HTTP status code `404` (Not Found).
+  - return the following JSON object: `{ message: "The user with the specified ID does not exist." }`.
+
+- If the request body is missing the `name` or `bio` property:
+
+  - respond with HTTP status code `400` (Bad Request).
+  - return the following JSON response: `{ errorMessage: "Please provide name and bio for the user." }`.
+
+- If there's an error when updating the _user_:
+
+  - respond with HTTP status code `500`.
+  - return the following JSON object: `{ errorMessage: "The user information could not be modified." }`.
+
+- If the user is found and the new information is valid:
+
+  - update the user document in the database using the new information sent in the `request body`.
+  - respond with HTTP status code `200` (OK).
+  - return the newly updated _user document_.
+
+## Stretch Problems
+
+To work on the stretch problems you'll need to enable the `cors` middleware. Follow these steps:
+
+- add the `cors` npm module: `npm i cors`.
+- add `server.use(cors())` after `server.use(express.json())`.
+
+Create a new React application and connect it to your server:
+
+- the React application can be anywhere, but, for this project create it inside the folder for the solution.
+- connect to the `/api/users` endpoint in the API and show the list of users.
+- add a delete button to each displayed user that will remove it from the server.
+- add forms to add and update data.
+- Style the list of users however you see fit.

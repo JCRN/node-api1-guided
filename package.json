@@ -1,0 +1,21 @@
+{
+  "name": "node-api1-project",
+  "version": "1.0.0",
+  "description": "Basic RESTful API built with Nodejs & Express",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "server": "nodemon index.js"
+  },
+  "repository": "git@github.com:JCRN/node-api1-project.git",
+  "author": "Jason Clemons <clemons.jason@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "prettier": "^2.0.5",
+    "shortid": "^2.2.15"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
